@@ -16,9 +16,14 @@ def verify_api_key(
     x_user_id: str | None = Header(default=None),
 ) -> str:
     """Validate X-API-Key and return the caller user id."""
-    expected_key = get_settings().agent_api_key
+    if x_api_key is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="invalid or missing API key",
+        )
 
-    if x_api_key is None or not secrets.compare_digest(x_api_key, expected_key):
+    expected_key = get_settings().agent_api_key
+    if not secrets.compare_digest(x_api_key, expected_key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="invalid or missing API key",

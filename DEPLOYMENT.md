@@ -1,101 +1,81 @@
-# Thông Tin Deploy — Checkpoint 5
+# Thong Tin Deploy - Checkpoint 5
 
-> Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đọc file này
-> để tìm địa chỉ service của bạn và gọi thử.
->
-> **Chỉ ghi TÊN biến môi trường, tuyệt đối không dán giá trị API key vào đây.**
-> Repo này công khai — dán khóa vào là mất khóa.
+## Thong Tin Hoc Vien
 
-## Thông Tin Học Viên
-
-| Mục | Nội dung |
+| Muc | Noi dung |
 |-----|----------|
-| Họ và tên | (điền họ tên) |
-| Mã học viên | (điền mã học viên) |
-| Repo | (điền link repo K4-L3A-DAY12-HoVaTen-MSSV-CloudServicesAndDeployment) |
+| Ho va ten | Nguyen Pham Oanh Oanh |
+| mã học viên | 2A202602518 |
+| Repo | https://github.com/tennguoisudung22012004/K4-L3A-DAY12-NguyenPhamOanhOanh-2A202602518-CloudServicesAndDeployment |
 
 ## Service
 
-| Mục | Nội dung |
+| Muc | Noi dung |
 |-----|----------|
-| Public URL | https://TODO-thay-bang-url-that.up.railway.app |
-| Platform | Railway / Render / Cloud Run — (điền platform bạn dùng) |
-| Ngày deploy | (điền ngày) |
+| Public URL | https://k4-l3a-day12-nguyenphamoanhoanh-2a202602518-clou-production.up.railway.app |
+| Platform | Railway |
+| Ngay deploy | 2026-09-28 |
 
-## Biến Môi Trường Đã Set Trên Cloud
+## Bien Moi Truong Da Set Tren Cloud
 
-Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
+Chi ghi ten bien, khong ghi gia tri secret that.
 
-| Biến | Đã set | Ghi chú |
+| Bien | Da set | Ghi chu |
 |------|--------|---------|
-| `PORT` | ✅ | platform tự gán |
-| `AGENT_API_KEY` | ✅ | đặt trong dashboard, không nằm trong repo |
-| `REDIS_URL` | ✅ | (điền: Redis add-on của platform / Upstash / ...) |
-| `RATE_LIMIT_PER_MINUTE` | ✅ | 10 |
-| `MONTHLY_BUDGET_USD` | ✅ | 10.0 |
-| `LOG_LEVEL` | ✅ | INFO |
+| `PORT` | co | Railway tu gan |
+| `AGENT_API_KEY` | can kiem tra tren Railway | dat trong Railway Variables, khong nam trong repo |
+| `REDIS_URL` | can kiem tra tren Railway | Redis add-on cua Railway |
+| `RATE_LIMIT_PER_MINUTE` | co | 10 |
+| `MONTHLY_BUDGET_USD` | co | 10.0 |
+| `LOG_LEVEL` | co | INFO |
 
-## Lệnh Kiểm Tra
+## Lenh Kiem Tra
 
-Thay `<URL>` bằng Public URL ở trên:
+Thay URL bang Public URL o tren:
 
 ```bash
-# 1. Liveness — mong đợi 200 {"status":"ok"}
-curl -i <URL>/health
+curl -i https://k4-l3a-day12-nguyenphamoanhoanh-2a202602518-clou-production.up.railway.app/health
 
-# 2. Readiness — mong đợi 200 {"status":"ready"} (đã nối được Redis)
-curl -i <URL>/ready
+curl -i https://k4-l3a-day12-nguyenphamoanhoanh-2a202602518-clou-production.up.railway.app/ready
 
-# 3. Không có API key — mong đợi 401
-curl -i -X POST <URL>/ask \
+curl -i -X POST https://k4-l3a-day12-nguyenphamoanhoanh-2a202602518-clou-production.up.railway.app/ask \
   -H "Content-Type: application/json" \
   -d '{"question":"Hello"}'
 
-# 4. Có API key — mong đợi 200 kèm câu trả lời
-curl -i -X POST <URL>/ask \
+curl -i -X POST https://k4-l3a-day12-nguyenphamoanhoanh-2a202602518-clou-production.up.railway.app/ask \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $AGENT_API_KEY" \
   -H "X-User-Id: sv-test" \
-  -d '{"question":"Deploy là gì?"}'
-
-# 5. Rate limit — gọi 15 lần, những lần cuối phải trả 429
-for i in $(seq 1 15); do
-  curl -s -o /dev/null -w "%{http_code} " -X POST <URL>/ask \
-    -H "Content-Type: application/json" \
-    -H "X-API-Key: $AGENT_API_KEY" \
-    -H "X-User-Id: sv-test" \
-    -d '{"question":"test"}'
-done; echo
+  -d '{"question":"Deploy la gi?"}'
 ```
 
-## Kết Quả Chạy Thật
+## Ket Qua Chay That
 
-Dán output của các lệnh trên vào đây:
+Lan kiem tra gan nhat:
 
+```text
+GET /health
+HTTP/1.1 200 OK
+{"status":"ok","service":"day12-agent","version":"1.0.0"}
+
+GET /ready
+HTTP/1.1 500 Internal Server Error
+Internal Server Error
+
+POST /ask khong co API key
+HTTP/1.1 500 Internal Server Error
+Internal Server Error
 ```
-(điền output)
-```
 
-## Ảnh Chụp Màn Hình
+Ghi chu: `/health` da hoat dong. `/ready` va `/ask` dang can kiem tra lai Railway Variables, dac biet la `AGENT_API_KEY` va `REDIS_URL`, sau do redeploy/restart service.
 
-Đặt ảnh trong thư mục `screenshots/`:
+## Anh Chup Man Hinh
 
-- `screenshots/dashboard.png` — trang quản lý service trên platform
-- `screenshots/health.png` — kết quả gọi `/health` từ trình duyệt hoặc curl
+Dat anh minh chung trong thu muc `screenshots/`:
 
----
+- `screenshots/dashboard.png`: dashboard Railway co service dang online.
+- `screenshots/health.png`: ket qua goi `/health`, `/ready`, `/ask`.
 
-## Nếu Dùng Phương Án Dự Phòng
+## Neu Dung Phuong An Du Phong
 
-Không đăng ký được tài khoản cloud? Vẫn nộp được bài, nhưng CP5 tối đa 60% điểm:
-
-1. Đặt `LOCAL_FALLBACK=true` trong `.env`
-2. Chạy `docker compose up -d` rồi kiểm tra `docker compose ps`
-3. Chụp màn hình vào `screenshots/`
-4. Chạy `pytest tests/test_cp5.py -v` — bộ test sẽ tự chuyển sang kiểm tra
-   `http://localhost:8000`
-5. Ghi rõ lý do không deploy được vào phần dưới đây:
-
-```
-(điền lý do nếu dùng phương án dự phòng, ngược lại xóa mục này)
-```
+Khong dung phuong an du phong. Bai deploy tren Railway.

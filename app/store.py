@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 import redis
 
@@ -13,7 +14,9 @@ HISTORY_TTL_SECONDS = 7 * 24 * 3600
 
 
 def get_redis_client(url: str | None = None):
-    url = url or get_settings().redis_url
+    url = url or os.getenv("REDIS_URL")
+    if url is None:
+        url = get_settings().redis_url
     if url.startswith("fake://"):
         import fakeredis
 
