@@ -7,16 +7,13 @@ import os
 
 import redis
 
-from .config import get_settings
-
 HISTORY_MAX_MESSAGES = 20
 HISTORY_TTL_SECONDS = 7 * 24 * 3600
+DEFAULT_REDIS_URL = "redis://localhost:6379/0"
 
 
 def get_redis_client(url: str | None = None):
-    url = url or os.getenv("REDIS_URL")
-    if url is None:
-        url = get_settings().redis_url
+    url = url or os.getenv("REDIS_URL") or DEFAULT_REDIS_URL
     if url.startswith("fake://"):
         import fakeredis
 
