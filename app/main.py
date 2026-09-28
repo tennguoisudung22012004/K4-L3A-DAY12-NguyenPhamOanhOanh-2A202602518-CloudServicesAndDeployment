@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 from functools import lru_cache
 
@@ -30,12 +31,14 @@ def get_store() -> ConversationStore:
 
 @lru_cache(maxsize=1)
 def get_rate_limiter() -> RateLimiter:
-    return RateLimiter(get_redis_client(), get_settings().rate_limit_per_minute)
+    limit = int(os.getenv("RATE_LIMIT_PER_MINUTE", "10"))
+    return RateLimiter(get_redis_client(), limit)
 
 
 @lru_cache(maxsize=1)
 def get_cost_guard() -> CostGuard:
-    return CostGuard(get_redis_client(), get_settings().monthly_budget_usd)
+    budget = float(os.getenv("MONTHLY_BUDGET_USD", "10.0"))
+    return CostGuard(get_redis_client(), budget)
 
 
 @asynccontextmanager
